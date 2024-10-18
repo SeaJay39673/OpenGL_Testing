@@ -1,2 +1,4 @@
-vcpkg*
+vcpkg/
 out
+
+*Presets.json
