@@ -44,7 +44,9 @@ Here is the list of steps to get ready to compile and run the application:
 #### Setup Environment:
 If you thought you were done, not quite. 
 
-Enter the command "CMake: Select Configure Preset" and select "NINJA Cross Compiler".
+Enter the command "CMake: Add Configure Preset" and choose "Create From Compilers", then choose a compiler (NOT STRAWBERRY - Windows).
+
+Enter the command "CMake: Select Configure Preset" and select the compiler you just added.
 
 Finally, enter the command "CMake: Delete Cache and Reconfigure".
 
