@@ -1,7 +1,8 @@
 {
   "dependencies": [
-    "opengl",
+    "glad",
     "glfw3",
-    "glad"
+    "opengl",
+    "stb"
   ]
 }

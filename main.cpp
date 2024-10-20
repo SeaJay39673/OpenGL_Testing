@@ -3,18 +3,15 @@
 #include <iostream>
 #include <string>
 #include <stdio.h>
+#include <fstream>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 using namespace std;
 
-const char *vertexShaderSource = "#version 330 core\n"
-                                 "layout (location = 0) in vec3 aPos;\n"
-                                 "void main()\n"
-                                 "{\n"
-                                 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-                                 "}\0";
-
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
+char *getFileBytes(string);
 
 int main(int, char **)
 {
@@ -45,19 +42,8 @@ int main(int, char **)
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // Call back so user can resize the window
 
-    float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f};
-
-    GLuint VBO;                                                                // Create a BufferID for rendering
-    glGenBuffers(1, &VBO);                                                     // Create and bind a new (single: 1) buffer to the BufferID
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);                                        // Bind the buffer to the ArrayBuffer target
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // Pass in our vertices to the Buffer and specify how to draw.
-    // GL_STATIC_DRAW specifies that the data will be set once and used many times, tells the gpu how to handle the data.
-
-    unsigned int vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    // TODO: Finish Shaders and Textures Tutorial
+    // TODO: Render Image to Screen
 
     while (!glfwWindowShouldClose(window)) // Where the window stuff happens.
     {
@@ -88,4 +74,47 @@ void processInput(GLFWwindow *window)
     {
         glfwSetWindowShouldClose(window, true);
     }
+}
+
+char *getFileBytes(string fileName)
+{
+    FILE *pFile;
+    long lSize;
+    char *buffer;
+    size_t result;
+
+    pFile = fopen(fileName.c_str(), "rb");
+    if (pFile == NULL)
+    {
+        fputs("File error", stderr);
+        exit(1);
+    }
+
+    // obtain file size:
+    fseek(pFile, 0, SEEK_END);
+    lSize = ftell(pFile);
+    rewind(pFile);
+
+    // allocate memory to contain the whole file:
+    buffer = (char *)malloc(sizeof(char) * lSize);
+    if (buffer == NULL)
+    {
+        fputs("Memory error", stderr);
+        exit(2);
+    }
+
+    // copy the file into the buffer:
+    result = fread(buffer, 1, lSize, pFile);
+    if (result != lSize)
+    {
+        fputs("Reading error", stderr);
+        exit(3);
+    }
+
+    /* the whole file is now loaded in the memory buffer. */
+
+    // terminate
+    fclose(pFile);
+
+    return buffer;
 }
