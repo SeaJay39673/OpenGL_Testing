@@ -20,6 +20,9 @@ For Mac/Linux:
 cd vcpkg; .\bootstrap-vcpkg.sh
 ```
 
+#### VCPKG Submodule Source Control:
+To get rid of problems with source controll tracking the vcpkg submodule, go to settings (UI), search for Git: Auto Repository Detection and set it to "Open Editors". Then reload vscode.
+
 Now you're done!
 
 #### Adding Packages with vcpkg:

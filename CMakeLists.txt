@@ -21,7 +21,7 @@ endif()
 # message(CMAKE_LIBRARY_OUTPUT_DIRECTORY_<CONFIG>="${CMAKE_LIBRARY_OUTPUT_DIRECTORY_<CONFIG>}")
 
 add_custom_target(copy_assets
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/photos ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/photos
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/Resources ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/Resources
 )
 add_dependencies(ShapesSandbox_Testing copy_assets)
 
@@ -38,3 +38,6 @@ target_link_libraries(ShapesSandbox_Testing PRIVATE OpenGL::GL)
 
 find_package(Stb REQUIRED)
 target_include_directories(ShapesSandbox_Testing PRIVATE ${Stb_INCLUDE_DIR})
+
+find_package(glm CONFIG REQUIRED)
+target_link_libraries(ShapesSandbox_Testing PRIVATE glm::glm)
