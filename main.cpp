@@ -1,6 +1,6 @@
-/*
-    Author: Christopher Edmunds
-    Last Updated: 10/20/2024
+/**
+    @author Christopher Edmunds
+    @date 10/20/2024
 */
 
 //====| Includes |====//
@@ -90,7 +90,7 @@ int main(int, char **)
     texShape.SetVertexPointer(2, 2, 8, 6);
     texShape.SetShader(shader2);
     texShape.SetDrawData(0, sizeof(texInds));
-    Texture tex;
+    Texture tex(GL_TEXTURE_2D);
     if (!tex.LoadTexture("../Resources/Photos/Homogeneous-1.png"))
     {
         return 1;

@@ -23,8 +23,8 @@ private:
         Elements
     };
     VAO vao;
-    VB vbo, ebo;
-    Texture tex;
+    VB vbo = VB(GL_ARRAY_BUFFER, GL_STATIC_DRAW), ebo = VB(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW);
+    Texture tex = Texture(GL_TEXTURE_2D);
     Shader shader;
     DrawMethod drawMethod;       // Specifies method in which to draw
     int drawFirst, drawElements; // Specifies how to draw data

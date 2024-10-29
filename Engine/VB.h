@@ -18,7 +18,6 @@ private:
     GLenum target, usage; // Target (GL_ARRAY_BUFFER/GL_ELEMENT_ARRAY_BUFFER), usage (GL_STATIC_DRAW/GL_DYNAMIC_DRAW)
 
 public:
-    VB();                                                 // Generate the buffer by ID
     VB(GLenum tgt, GLenum usg);                           // Generate buffer by ID, initialize the target and usage
     template <typename T>                                 //
     VB(GLenum tgt, GLenum usg, T *data, GLsizeiptr size); // Generate buffer by ID, initialize target and usage, update the data given.
@@ -28,14 +27,6 @@ public:
     void Bind();                                          // Bind the buffer
     void Unbind();                                        // Unbind the buffer
 };
-
-/**
-    @details Constructor for the VB, generates the OpenGL buffer ID
- */
-VB::VB()
-{
-    glGenBuffers(1, &ID);
-}
 
 /**
     @details Constructor for the VB, generates the OpenGL buffer ID, and initializes the target and usage
