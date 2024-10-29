@@ -50,8 +50,8 @@ public:
 };
 
 /**
-    @brief Creates the VAO and VBO
-    @details Constructor for shape class. Creates the VBO with passed in data.
+    @brief Creates the VAO class object and OpenGL VBO
+    @details Creates the VAO class object, and the OpenGL VBO through the VB class object.
     @param type Specify type of drawing method (STATIC or DYNAMIC)
     @param vertices Specify vertex data for VBO
     @param vSize Specify size of vertex data for VBO
@@ -62,8 +62,8 @@ Shape::Shape(GLenum type, float *vertices, int vSize) : transform(glm::mat4(1.0f
 }
 
 /**
-    @brief Creates the VAO, VBO, and EBO
-    @details Constructor for shape class. Creates the VBO and EBO with passed in data.
+    @brief Creates the VAO class object, OpenGL VBO and EBO
+    @details Creates the VAO class object and the OpenGL VBO and EBO through the VB class objects.
     @param type Specify type of drawing method (STATIC or DYNAMIC)
     @param vertices Specify vertex data for VBO
     @param vSize Specify size of vertex data for VBO
@@ -104,8 +104,7 @@ void Shape::UpdateData(float *vertices, int vSize, unsigned int *indices, int iS
 }
 
 /**
-    @brief Specify how the shader should read data
-    @details Specify how the data should be interpreted by the shader
+    @brief Specify how the data should be interpreted by the shader
     @param layout Which layout (location) in the shader will read in the data
     @param elements How many elements are there to read per vertex
     @param span How many elements to be skipped before the next vertex can be read
@@ -117,8 +116,7 @@ void Shape::SetVertexPointer(GLuint layout, int elements, int span, int index)
     vao.LinkVB(vbo, layout, elements, span, index);
 }
 /**
-    @brief Binds the shape object
-    @details Binds the shape object (VAO, VBO, EBO, Texture)
+    @brief Binds the shape object (VAO, VBO, EBO, Texture)
  */
 void Shape::Bind()
 {
@@ -129,8 +127,7 @@ void Shape::Bind()
 }
 
 /**
-    @brief Unbinds the shape object
-    @details Unbinds the shape object (VAO, VBO, EBO, Texture)
+    @brief Unbinds the shape object (VAO, VBO, EBO, Texture)
  */
 void Shape::Unbind()
 {
@@ -142,7 +139,7 @@ void Shape::Unbind()
 
 /**
     @brief Specify draw data
-    @details Specify how the draw method should function
+    @details Specify the necessary information for the draw method to function.
     @param first Index of the first element to be read
     @param elements Number of elements to draw (vertices or indices)
  */

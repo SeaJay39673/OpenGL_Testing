@@ -32,7 +32,7 @@ public:
 
 /**
     @brief Generate OpenGL texture object with target
-    @details Generates OpenGL texture object ID, initialize target
+    @details Generates OpenGL texture object, initialize target
     @param type type of target texture (GL_TEXTURE_2D, etc.)
  */
 Texture::Texture(GLenum type) : target(type)
@@ -42,7 +42,6 @@ Texture::Texture(GLenum type) : target(type)
 
 /**
     @brief Deletes the OpenGL texture
-    @details Deletes the OpenGL texture object by ID
  */
 Texture::~Texture()
 {
@@ -89,7 +88,6 @@ bool Texture::LoadTexture(const char *path)
 
 /**
     @brief Bind OpenGL texture
-    @details Binds the OpenGL texture by ID
  */
 void Texture::Bind()
 {
@@ -98,7 +96,6 @@ void Texture::Bind()
 
 /**
     @brief Unbind Opengl texture
-    @details Unbinds the OpenGL texture
  */
 void Texture::Unbind()
 {

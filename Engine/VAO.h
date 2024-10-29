@@ -24,23 +24,23 @@ public:
 };
 
 /**
-    @details Constructor for VAO, generates the OpenGL VAO ID
+    @brief Generates OpenGL VAO object
  */
 VAO::VAO() { glGenVertexArrays(1, &ID); }
 
 /**
-    @details Destructor for VAO, deletes the OpenGL VAO ID
+    @brief Deletes the OpenGL VAO object
  */
 VAO::~VAO() { glDeleteVertexArrays(1, &ID); }
 
 /**
     @brief Links the VBO to the VAO
     @details Link the VBO to the VAO, specify to the shader how to interpret the VBO data
-    @param vb (VB&) reference to the VB object
-    @param layout (GLuint) specify which layout (location) the shader will receive this data
-    @param elements (int) number of vertices to be read in
-    @param span (int) how many floats (elements of the array data) will need to be skipped before beginning the next vertex
-    @param index (int) which element of the array to start reading the data
+    @param vb reference to the VB object
+    @param layout specify which layout (location) the shader will receive this data
+    @param elements number of vertices to be read in
+    @param span how many floats (elements of the array data) will need to be skipped before beginning the next vertex
+    @param index which element of the array to start reading the data
  */
 void VAO::LinkVB(VB &vb, GLuint layout, int elements, int span, int index)
 {
@@ -52,7 +52,7 @@ void VAO::LinkVB(VB &vb, GLuint layout, int elements, int span, int index)
 }
 
 /**
-    @details Binds the VAO by ID
+    @brief Binds the OpenGL VAO object
  */
 void VAO::Bind()
 {
@@ -60,7 +60,7 @@ void VAO::Bind()
 }
 
 /**
-    @details Unbinds the VAO
+    @brief Unbinds the OpenGL object
  */
 void VAO::Unbind()
 {

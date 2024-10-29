@@ -29,7 +29,8 @@ public:
 };
 
 /**
-    @details Constructor for the VB, generates the OpenGL buffer ID, and initializes the target and usage
+    @brief Generate the OpenGL buffer object with specified target and usage
+    @details Constructor for the VB, generates the OpenGL buffer, and initializes the target and usage
     @param tgt (GLenum) specifies the target buffer (GL_ARRAY_BUFFER/GL_ELEMENT_ARRAY_BUFFER)
     @param usg (GLenum) specifies the way the buffer will be used (GL_STATIC_DRAW/GL_DYNAMIC_DRAW)
  */
@@ -39,6 +40,7 @@ VB::VB(GLenum tgt, GLenum usg) : target(tgt), usage(usg)
 }
 
 /**
+    @brief Generate the OpenGL buffer object with specified target, usage, and data
     @details Constructor for the VB, generates OpenGL buffer ID, initializes target and usage, and updates that data.
     @param tgt (GLenum) specifies the target buffer (GL_ARRAY_BUFFER/GL_ELEMENT_ARRAY_BUFFER)
     @param usg (GLenum) specifies the way the buffer will be used (GL_STATIC_DRAW/GL_DYNAMIC_DRAW)
@@ -53,7 +55,7 @@ VB::VB(GLenum tgt, GLenum usg, T *data, GLsizeiptr size) : target(tgt), usage(us
 }
 
 /**
-    @details Destructor for the VB object, deletes the OpenGL buffer by ID.
+    @brief Deletes the OpenGL buffer object
  */
 VB::~VB()
 {
@@ -61,7 +63,7 @@ VB::~VB()
 }
 
 /**
-    @details Updates the data for the OpenGL buffer object.
+    @brief Updates the OpenGL Buffer object data
     @param data (template T*) data to be passed in to the buffer
     @param size (GLsizeiptr) size of data passed in
  */
@@ -73,7 +75,7 @@ void VB::UpdateData(T *data, GLsizeiptr size)
 }
 
 /**
-    @details Binds the OpenGL buffer object
+    @brief Binds the OpenGL buffer object
  */
 void VB::Bind()
 {
@@ -81,7 +83,7 @@ void VB::Bind()
 }
 
 /**
-    @details Unbinds the OpenGL buffer object
+    @brief Unbinds the OpenGL buffer object
  */
 void VB::Unbind()
 {
