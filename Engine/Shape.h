@@ -3,7 +3,7 @@
     @brief Class for creating and manipulating shapes
     @details This class is used for managing VAO, VBO, and EBO objects all together to create different shapes.s
     @author Christopher Edmunds
-    @date 10/26/2024
+    @date 10/29/2024
 */
 #pragma once
 #ifndef SHAPE_CLASS_H
