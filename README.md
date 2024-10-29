@@ -13,11 +13,16 @@ git clone https://github.com/microsoft/vcpkg.git
 
 For Windows:
 ```
-cd vcpkg; .\bootstrap-vcpkg.bat
+./vcpkg/bootstrap-vcpkg.bat
 ```
 For Mac/Linux:
 ```
-cd vcpkg; .\bootstrap-vcpkg.sh
+./vcpkg/bootstrap-vcpkg.sh
+```
+
+***Note: if there is no vcpkg.json or vcpkg-configuration.json files already in your repo directory, run the following command first:***
+```
+./vcpkg/vcpkg new --application
 ```
 
 #### VCPKG Submodule Source Control:
@@ -45,12 +50,10 @@ This adds many tools needed to compile and run the application
 Here is the list of steps to get ready to compile and run the application:
 
 #### Setup Environment:
-If you thought you were done, not quite. 
 
-Enter the command "CMake: Add Configure Preset" and choose "Create From Compilers", then choose a compiler (NOT STRAWBERRY - Windows).
-
-Enter the command "CMake: Select Configure Preset" and select the compiler you just added.
-
-Finally, enter the command "CMake: Delete Cache and Reconfigure".
+Enter the command "CMake: Select a Kit" and then choose an x64 compiler (NOT STRAWBERRY - Windows).
 
 Now, you can either use the keyboard shortcuts or select the run to run the program.
+
+## Debugging CMake Builds.
+If you are getting build errors that you are sure is not your code but instead a problem with CMake, enter the command "CMake Delete Cache and Reconfigure." This *may* fix the issue.
