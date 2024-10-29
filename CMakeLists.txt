@@ -5,6 +5,7 @@ project(ShapesSandbox_Testing VERSION 0.1.0 LANGUAGES C CXX)
 
 add_executable(ShapesSandbox_Testing main.cpp)
 
+set(CMAKE_MAIN_PROJECT ${PROJECT_NAME} CACHE INTERNAL "")
 
 include(CTest)
 enable_testing()
@@ -14,13 +15,6 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
 
-###############
-# Generate Docs
-###############
-OPTION(BUILD_WITH_DOCS "Generate Docs" ON)
-IF(TASKSCH_BUILD_WITH_DOCS)
-    ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/Docs)
-ENDIF
 
 
 ################################
@@ -31,12 +25,20 @@ set(VCPKG_HOST_TRIPLET x64-windows-static)
 set(VCPKG_TARGET_TRIPLET x64-windows-static)
 endif()
 
+###############
+# Generate Docs
+###############
+OPTION(BUILD_WITH_DOCS "Generate Docs" ON)
+set(BUILD_WITH_DOCS OFF) # Set this to ON to manually build with docs.
+IF(BUILD_WITH_DOCS)
+	ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/docs)
+ENDIF()
 
 #############################################################
 # Add Resources to build directory so program can access them
 #############################################################
 add_custom_target(copy_assets
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/Resources ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/Resources
+COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/Resources ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/Resources
 )
 add_dependencies(ShapesSandbox_Testing copy_assets)
 
