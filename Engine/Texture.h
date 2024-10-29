@@ -31,8 +31,9 @@ public:
 };
 
 /**
+    @brief Generate OpenGL texture object with target
     @details Generates OpenGL texture object ID, initialize target
-    @param type (GLenum) type of target texture (GL_TEXTURE_2D, etc.)
+    @param type type of target texture (GL_TEXTURE_2D, etc.)
  */
 Texture::Texture(GLenum type) : target(type)
 {
@@ -40,6 +41,7 @@ Texture::Texture(GLenum type) : target(type)
 }
 
 /**
+    @brief Deletes the OpenGL texture
     @details Deletes the OpenGL texture object by ID
  */
 Texture::~Texture()
@@ -48,9 +50,10 @@ Texture::~Texture()
 }
 
 /**
+    @brief Updates the OpenGL texture parameters
     @details Updates the OpenGL texture object parameters
-    @param type (GLenum) type of texture parameter to update
-    @param specification (GLint) how you want the parameter to be updated
+    @param type type of texture parameter to update
+    @param specification how you want the parameter to be updated
  */
 void Texture::UpdateParameter(GLenum type, GLint specification)
 {
@@ -59,9 +62,10 @@ void Texture::UpdateParameter(GLenum type, GLint specification)
 }
 
 /**
+    @brief Load image and bind to OpenGL texture
     @details Load texture from path to image file and bind to OpenGL texture object ID
-    @param path (const char*) path to image file to be loaded in
-    @returns bool wether or not loading the texture was successful
+    @param path path to image file to be loaded in
+    @returns bool, wether or not loading the texture was successful
  */
 bool Texture::LoadTexture(const char *path)
 {
@@ -84,6 +88,7 @@ bool Texture::LoadTexture(const char *path)
 }
 
 /**
+    @brief Bind OpenGL texture
     @details Binds the OpenGL texture by ID
  */
 void Texture::Bind()
@@ -92,6 +97,7 @@ void Texture::Bind()
 }
 
 /**
+    @brief Unbind Opengl texture
     @details Unbinds the OpenGL texture
  */
 void Texture::Unbind()
