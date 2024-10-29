@@ -50,10 +50,11 @@ public:
 };
 
 /**
+    @brief Creates the VAO and VBO
     @details Constructor for shape class. Creates the VBO with passed in data.
-    @param type (GLenum) specify type of drawing method (STATIC or DYNAMIC)
-    @param vertices (float*) specify vertex data for VBO
-    @param vSize (int) specify size of vertex data for VBO
+    @param type Specify type of drawing method (STATIC or DYNAMIC)
+    @param vertices Specify vertex data for VBO
+    @param vSize Specify size of vertex data for VBO
 */
 Shape::Shape(GLenum type, float *vertices, int vSize) : transform(glm::mat4(1.0f)), translate(glm::vec3(0, 0, 0)), vbo(GL_ARRAY_BUFFER, type)
 {
@@ -61,12 +62,13 @@ Shape::Shape(GLenum type, float *vertices, int vSize) : transform(glm::mat4(1.0f
 }
 
 /**
+    @brief Creates the VAO, VBO, and EBO
     @details Constructor for shape class. Creates the VBO and EBO with passed in data.
-    @param type (GLenum) specify type of drawing method (STATIC or DYNAMIC)
-    @param vertices (float*) specify vertex data for VBO
-    @param vSize (int) specify size of vertex data for VBO
-    @param indices (unsigned int*) specify index data for EBO
-    @param iSize (int) specify size of index data for EBO
+    @param type Specify type of drawing method (STATIC or DYNAMIC)
+    @param vertices Specify vertex data for VBO
+    @param vSize Specify size of vertex data for VBO
+    @param indices Specify index data for EBO
+    @param iSize Specify size of index data for EBO
 */
 Shape::Shape(GLenum type, float *vertices, int vSize, unsigned int *indices, int iSize) : vbo(GL_ARRAY_BUFFER, type), ebo(GL_ELEMENT_ARRAY_BUFFER, type)
 {
@@ -74,9 +76,10 @@ Shape::Shape(GLenum type, float *vertices, int vSize, unsigned int *indices, int
 }
 
 /**
+    @brief Updates the VBO data
     @details Updates the VBO with passed in data, determines how the draw method should function based on data.
-    @param vertices (float*) specify vertex data for VBO
-    @param vSize (int) specify size of vertex data for VBO
+    @param vertices Specify vertex data for VBO
+    @param vSize Specify size of vertex data for VBO
  */
 void Shape::UpdateData(float *vertices, int vSize)
 {
@@ -86,11 +89,12 @@ void Shape::UpdateData(float *vertices, int vSize)
 }
 
 /**
+    @brief Updates the VBO and EBO data
     @details Updates the VBO and EBO with passed in data, determines how the draw method should function based on data.
-    @param vertices (float*) specify vertex data for VBO
-    @param vSize (int) specify size of vertex data for VBO
-    @param indices (unsigned int*) specify index data for EBO
-    @param iSize (int) specify size of index data for EBO
+    @param vertices Specify vertex data for VBO
+    @param vSize Specify size of vertex data for VBO
+    @param indices Specify index data for EBO
+    @param iSize Specify size of index data for EBO
 */
 void Shape::UpdateData(float *vertices, int vSize, unsigned int *indices, int iSize)
 {
@@ -100,11 +104,12 @@ void Shape::UpdateData(float *vertices, int vSize, unsigned int *indices, int iS
 }
 
 /**
+    @brief Specify how the shader should read data
     @details Specify how the data should be interpreted by the shader
-    @param layout (GLuint) which layout (location) in the shader will read in the data
-    @param elements (int) how many elements are there to read per vertex
-    @param span (int) how many elements to be skipped before the next vertex can be read
-    @param index (int) the index of data to start reading in on the shader
+    @param layout Which layout (location) in the shader will read in the data
+    @param elements How many elements are there to read per vertex
+    @param span How many elements to be skipped before the next vertex can be read
+    @param index The index of data to start reading in on the shader
 */
 void Shape::SetVertexPointer(GLuint layout, int elements, int span, int index)
 {
@@ -112,6 +117,7 @@ void Shape::SetVertexPointer(GLuint layout, int elements, int span, int index)
     vao.LinkVB(vbo, layout, elements, span, index);
 }
 /**
+    @brief Binds the shape object
     @details Binds the shape object (VAO, VBO, EBO, Texture)
  */
 void Shape::Bind()
@@ -123,6 +129,7 @@ void Shape::Bind()
 }
 
 /**
+    @brief Unbinds the shape object
     @details Unbinds the shape object (VAO, VBO, EBO, Texture)
  */
 void Shape::Unbind()
@@ -134,9 +141,10 @@ void Shape::Unbind()
 }
 
 /**
+    @brief Specify draw data
     @details Specify how the draw method should function
-    @param first (int) index of the first element to be read
-    @param elements (int) number of elements to draw (vertices or indices)
+    @param first Index of the first element to be read
+    @param elements Number of elements to draw (vertices or indices)
  */
 void Shape::SetDrawData(int first, int elements)
 {
@@ -145,6 +153,7 @@ void Shape::SetDrawData(int first, int elements)
 }
 
 /**
+    @brief Draws the shape
     @details Uses the provided shader, binds the object, calls its draw function, and unbinds.
  */
 void Shape::Draw()
@@ -168,7 +177,7 @@ void Shape::Draw()
 /**
     @brief Sets the current texture
     @details Pass in a texture object, this class receives it by reference.
-    @param txtr (Texture&) The texture object to be passed in
+    @param txtr The texture object to be passed in
  */
 void Shape::SetTexture(Texture &txtr)
 {
@@ -179,7 +188,7 @@ void Shape::SetTexture(Texture &txtr)
 /**
     @brief Sets the current shader
     @details Pass in a shader object, this class receives it by reference
-    @param shdr (Shader&) The shader object to be passed in
+    @param shdr The shader object to be passed in
  */
 void Shape::SetShader(Shader &shdr)
 {
@@ -187,8 +196,9 @@ void Shape::SetShader(Shader &shdr)
 }
 
 /**
+    @brief Rotates the shape
     @details Rotate the shape by a given angle (Radians)
-    @param angle (float) The angle to be rotated by
+    @param angle The angle to be rotated by
  */
 void Shape::Rotate(float angle)
 {
@@ -199,8 +209,9 @@ void Shape::Rotate(float angle)
 }
 
 /**
+    @brief Scale the shape
     @details Scale the shape by a given scalar
-    @param scalar (float) the scalar to be scaled by
+    @param scalar the scalar to be scaled by
  */
 void Shape::Scale(float scalar)
 {
@@ -208,8 +219,9 @@ void Shape::Scale(float scalar)
 }
 
 /**
+    @brief Translate the shape
     @details Translate the shape by a given translation vector
-    @param trans (glm::vec3) The translation vector to be applied to the shape
+    @param trans The translation vector to be applied to the shape
  */
 void Shape::Translate(glm::vec3 trans)
 {
