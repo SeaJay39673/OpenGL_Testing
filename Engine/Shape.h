@@ -158,7 +158,7 @@ void Shape::Draw()
         glDrawArrays(GL_TRIANGLES, drawFirst, drawElements);
         break;
     case Elements:
-        glDrawElements(GL_TRIANGLES, drawElements, GL_UNSIGNED_INT, (void *)drawFirst);
+        glDrawElements(GL_TRIANGLES, drawElements, GL_UNSIGNED_INT, (void *)(drawFirst * sizeof(float)));
     default:
         break;
     }

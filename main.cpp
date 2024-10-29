@@ -19,8 +19,7 @@ using namespace std;
 //====| Global Variables |====//
 int _width = 800, _height = 600;
 //====| Function Declarations |====//
-GLFWwindow *
-initWindow();                                                              // Create and initialize window to default variables
+GLFWwindow *initWindow();                                                  // Create and initialize window to default variables
 bool initGlad();                                                           // Initialize glad to expose OpenGL function pointers
 void framebuffer_size_callback(GLFWwindow *window, int width, int height); // function that sets GLFWwindow size when user changes it
 void processInput(GLFWwindow *window);                                     // Process user input
