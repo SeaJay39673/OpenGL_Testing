@@ -13,20 +13,41 @@ set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
+
+###############
+# Generate Docs
+###############
+OPTION(BUILD_WITH_DOCS "Generate Docs" ON)
+IF(TASKSCH_BUILD_WITH_DOCS)
+    ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/Docs)
+ENDIF
+
+
+################################
+# Compile Statically for Windows
+################################
 if(WIN32) # Need to compile statically to prevent Windows .dll not found error for glfw
 set(VCPKG_HOST_TRIPLET x64-windows-static)
 set(VCPKG_TARGET_TRIPLET x64-windows-static)
 endif()
 
-# message(CMAKE_LIBRARY_OUTPUT_DIRECTORY_<CONFIG>="${CMAKE_LIBRARY_OUTPUT_DIRECTORY_<CONFIG>}")
 
+#############################################################
+# Add Resources to build directory so program can access them
+#############################################################
 add_custom_target(copy_assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/Resources ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/Resources
 )
 add_dependencies(ShapesSandbox_Testing copy_assets)
 
+#############################################################
+# Include VCPKG so CMake knows how to find 3rd party packages
+#############################################################
 include(./vcpkg/scripts/buildsystems/vcpkg.cmake)
 
+########################
+# Find and link packages
+########################
 find_package(glad CONFIG REQUIRED)
 target_link_libraries(ShapesSandbox_Testing PRIVATE glad::glad)
 
