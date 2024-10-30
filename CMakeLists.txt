@@ -23,6 +23,12 @@ include(CPack)
 if(WIN32) # Need to compile statically to prevent Windows .dll not found error for glfw
 set(VCPKG_HOST_TRIPLET x64-windows-static)
 set(VCPKG_TARGET_TRIPLET x64-windows-static)
+elseif(APPLE)
+set(VCPKG_HOST_TRIPLET arm64-osx)
+set(VCPKG_TARGET_TRIPLET arm64-osx)
+elseif(UNIX AND NOT APPLE)
+set(VCPKG_HOST_TRIPLET x64-linux)
+set(VCPKG_TARGET_TRIPLET x64-linux)
 endif()
 
 ###############
