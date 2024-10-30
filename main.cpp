@@ -84,19 +84,35 @@ int main(int, char **)
     // triangles.SetShader(shader1);
     // triangles.Unbind();
 
-    Shape texShape(GL_STATIC_DRAW, texVerts, sizeof(texVerts), texInds, sizeof(texInds));
-    texShape.SetVertexPointer(0, 3, 8, 0);
-    texShape.SetVertexPointer(1, 3, 8, 3);
-    texShape.SetVertexPointer(2, 2, 8, 6);
-    texShape.SetShader(shader2);
-    texShape.SetDrawData(0, sizeof(texInds));
-    Texture tex(GL_TEXTURE_2D);
-    if (!tex.LoadTexture("../Resources/Photos/Homogeneous-1.png"))
-    {
-        return 1;
-    }
-    texShape.SetTexture(tex);
-    texShape.Unbind();
+    // Shape texShape(GL_STATIC_DRAW, texVerts, sizeof(texVerts), texInds, sizeof(texInds));
+    // texShape.SetVertexPointer(0, 3, 8, 0);
+    // texShape.SetVertexPointer(1, 3, 8, 3);
+    // texShape.SetVertexPointer(2, 2, 8, 6);
+    // texShape.SetShader(shader2);
+    // texShape.SetDrawData(0, sizeof(texInds));
+    // Texture tex(GL_TEXTURE_2D);
+    // if (!tex.LoadTexture("../Resources/Photos/Homogeneous-1.png"))
+    // {
+    //     return 1;
+    // }
+    // texShape.SetTexture(tex);
+    // texShape.Unbind();
+
+    /**
+     * # Vertices
+    v -0.5 -0.5, 0
+    v -0.5 0.5 0
+    v 0.5 0.5 0
+    v 0.5 -0.5 0
+    # Faces
+    f 0/0/0 1/0/0 3/0/0
+    f 1/0/0 2/0/0 3/0/0
+     */
+
+    Shape testShape(GL_STATIC_DRAW, "../Resources/Models/square.obj");
+    testShape.SetVertexPointer(0, 3, 3, 0);
+    testShape.SetDrawData(0, 6);
+    testShape.SetShader(shader1);
 
     while (!glfwWindowShouldClose(window)) // Where the window stuff happens.
     {
@@ -108,7 +124,8 @@ int main(int, char **)
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        texShape.Draw();
+        // texShape.Draw();
+        testShape.Draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -131,8 +148,8 @@ GLFWwindow *initWindow()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Specify which type of OpenGL to use
-    glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);                       // Start in maximized mode
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // Needed for Mac
+    // glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);                       // Start in maximized mode
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Needed for Mac
 
     // Create the window and display it
     GLFWwindow *window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
@@ -155,7 +172,7 @@ GLFWwindow *initWindow()
         }
         return NULL;
     }
-    glViewport(0, 0, _width, _height); // Tell OpenGL size of rendering window
+    glViewport(0, 0, _width * 2, _height * 2); // Tell OpenGL size of rendering window
 
     return window;
 }
