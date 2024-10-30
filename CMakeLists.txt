@@ -26,8 +26,9 @@ endif()
 # Define Apple Architecture #
 #############################
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    add_definitions(-DMACOSX)
-		set(-DMACOSX TRUE)
+	add_definitions(-DMACOSX=1)
+else()
+	add_definitions(-DMACOSX=0)
 endif()
 
 ###############
