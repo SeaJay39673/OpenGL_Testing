@@ -14,15 +14,20 @@ set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
-
-
-
 ################################
 # Compile Statically for Windows
 ################################
 if(WIN32) # Need to compile statically to prevent Windows .dll not found error for glfw
 set(VCPKG_HOST_TRIPLET x64-windows-static)
 set(VCPKG_TARGET_TRIPLET x64-windows-static)
+endif()
+
+#############################
+# Define Apple Architecture #
+#############################
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    add_definitions(-DMACOSX)
+		set(-DMACOSX TRUE)
 endif()
 
 ###############

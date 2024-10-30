@@ -10,6 +10,9 @@
 #define SHAPE_CLASS_H
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <string>
+#include <fstream>
+#include <vector>
 #include "VAO.h"
 #include "VB.h"
 #include "Texture.h"
@@ -35,6 +38,7 @@ private:
 public:
     Shape(GLenum type, float *vertices, int vSize);                                   // Creates just a VAO and VBO
     Shape(GLenum type, float *vertices, int vSize, unsigned int *indices, int iSize); // Creates VAO, VBO, and EBO
+    Shape(GLenum type, std::string objPath);                                          // Loads mesh from a given obj file path
     void UpdateData(float *vertices, int vSize);                                      // Updates the VBO
     void UpdateData(float *vertices, int vSize, unsigned int *indices, int iSize);    // Updates the VBO and EBO
     void SetVertexPointer(GLuint layout, int elements, int span, int index);          // Tells graphics shader how to interpret the data
@@ -73,6 +77,82 @@ Shape::Shape(GLenum type, float *vertices, int vSize) : transform(glm::mat4(1.0f
 Shape::Shape(GLenum type, float *vertices, int vSize, unsigned int *indices, int iSize) : vbo(GL_ARRAY_BUFFER, type), ebo(GL_ELEMENT_ARRAY_BUFFER, type)
 {
     UpdateData(vertices, vSize, indices, iSize);
+}
+/**
+ * @brief Creates the VAO class object, OpenGL VBO and EBO
+ * @details Reads in an OBJ file and creates a mesh based on that
+ * @param objPath Path to the obj file
+ */
+Shape::Shape(GLenum type, std::string path) : vbo(GL_ARRAY_BUFFER, type), ebo(GL_ELEMENT_ARRAY_BUFFER, type), transform(glm::mat4(1.0f))
+{
+    std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
+    std::vector<float> vertices, normals;
+    std::vector<float> uvs;
+    float buffer[3];
+
+    FILE *file = fopen(path.c_str(), "r");
+    if (file == NULL)
+    {
+        std::cout << "Cannot open file " << path << std::endl;
+        return;
+    }
+
+    while (true)
+    {
+        char lineHeader[128];
+        // read the first word of the line
+        int res = fscanf(file, "%s", lineHeader);
+        if (res == EOF)
+            break; // EOF = End Of File. Quit the loop.
+
+        // else : parse lineHeader
+        if (strcmp(lineHeader, "v") == 0)
+        {
+            fscanf(file, "%f %f %f\n", &buffer[0], &buffer[1], &buffer[2]);
+            for (int i = 0; i < 3; i++)
+            {
+                vertices.push_back(buffer[i]);
+            }
+        }
+        else if (strcmp(lineHeader, "vt") == 0)
+        {
+            fscanf(file, "%f %f\n", &buffer[0], &buffer[1]);
+            for (int i = 0; i < 2; i++)
+            {
+                uvs.push_back(buffer[i]);
+            }
+        }
+        else if (strcmp(lineHeader, "vn") == 0)
+        {
+            fscanf(file, "%f %f %f\n", &buffer[0], &buffer[1], &buffer[2]);
+            for (int i = 0; i < 3; i++)
+            {
+                normals.push_back(buffer[i]);
+            }
+        }
+        else if (strcmp(lineHeader, "f") == 0)
+        {
+            std::string vertex1, vertex2, vertex3;
+            unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
+            int matches = fscanf(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
+            if (matches != 9)
+            {
+                printf("Unable to read OBJ file! Make sure all face vertices are present.\n");
+                return;
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                vertexIndices.push_back(vertexIndex[i]);
+                uvIndices.push_back(uvIndex[i]);
+                normalIndices.push_back(normalIndex[i]);
+            }
+        }
+    }
+
+    float *vertices_arr = &vertices[0];
+    unsigned int *vertexIndices_arr = &vertexIndices[0];
+
+    UpdateData(vertices_arr, vertices.size() * sizeof(float), vertexIndices_arr, vertexIndices.size() * sizeof(unsigned int));
 }
 
 /**
