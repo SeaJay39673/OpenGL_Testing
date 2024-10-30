@@ -109,7 +109,7 @@ int main(int, char **)
     f 1/0/0 2/0/0 3/0/0
      */
 
-    Shape testShape(GL_STATIC_DRAW, "../Resources/Models/square.obj");
+    Shape testShape(GL_STATIC_DRAW, "./Debug/Resources/Models/square.obj");
     testShape.SetVertexPointer(0, 3, 3, 0);
     testShape.SetDrawData(0, 6);
     testShape.SetShader(shader1);
