@@ -144,7 +144,7 @@ Shape::Shape(GLenum type, std::string path) : vbo(GL_ARRAY_BUFFER, type), ebo(GL
             {
                 vertexIndices.push_back(vertexIndex[i]);
                 uvIndices.push_back(uvIndex[i]);
-                normals.push_back(normalIndex[i]);
+                normalIndices.push_back(normalIndex[i]);
             }
         }
     }
