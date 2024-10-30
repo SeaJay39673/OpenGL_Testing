@@ -148,8 +148,8 @@ GLFWwindow *initWindow()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Specify which type of OpenGL to use
-    // glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);                       // Start in maximized mode
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Needed for Mac
+    glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);                       // Start in maximized mode
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // Needed for Mac
 
     // Create the window and display it
     GLFWwindow *window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
@@ -172,7 +172,14 @@ GLFWwindow *initWindow()
         }
         return NULL;
     }
-    glViewport(0, 0, _width * 2, _height * 2); // Tell OpenGL size of rendering window
+    if (MACOSX)
+    {
+        glViewport(0, 0, _width * 2, _height * 2); // Tell OpenGL size of rendering window
+    }
+    else
+    {
+        glViewport(0, 0, _width, _height); // Tell OpenGL size of rendering window
+    }
 
     return window;
 }
