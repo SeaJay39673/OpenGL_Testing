@@ -293,7 +293,7 @@ void Shape::SetShader(Shader &shdr)
  */
 void Shape::Rotate(float angle, glm::vec3 axis)
 {
-    model = glm::rotate(model, angle, axis);
+    model = glm::rotate(glm::mat4(1.0f), angle, axis) * model;
 }
 
 /**
