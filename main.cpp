@@ -18,6 +18,7 @@ using namespace std;
 
 //====| Global Variables |====//
 int _width = 800, _height = 600;
+Shape *currentShape;
 //====| Function Declarations |====//
 GLFWwindow *initWindow();                                                  // Create and initialize window to default variables
 bool initGlad();                                                           // Initialize glad to expose OpenGL function pointers
@@ -98,21 +99,17 @@ int main(int, char **)
     // texShape.SetTexture(tex);
     // texShape.Unbind();
 
-    /**
-     * # Vertices
-    v -0.5 -0.5, 0
-    v -0.5 0.5 0
-    v 0.5 0.5 0
-    v 0.5 -0.5 0
-    # Faces
-    f 0/0/0 1/0/0 3/0/0
-    f 1/0/0 2/0/0 3/0/0
-     */
+    Shape shape1 = Shape(GL_STATIC_DRAW, "../Resources/Models/cube.obj");
+    shape1.SetVertexPointer(0, 3, 3, 0);
+    shape1.SetDrawData(0, 12 * 3);
+    shape1.SetShader(shader1);
 
-    Shape testShape(GL_STATIC_DRAW, "../Resources/Models/square.obj");
-    testShape.SetVertexPointer(0, 3, 3, 0);
-    testShape.SetDrawData(0, 6);
-    testShape.SetShader(shader1);
+    // Move the shape into the view volume for viewing
+    shape1.Translate(glm::vec3(0, 0, -5.0f));
+
+    currentShape = &shape1;
+
+    glEnable(GL_DEPTH_TEST);
 
     while (!glfwWindowShouldClose(window)) // Where the window stuff happens.
     {
@@ -122,10 +119,10 @@ int main(int, char **)
         // rendering commands
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // texShape.Draw();
-        testShape.Draw();
+        shape1.Draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -230,4 +227,36 @@ void processInput(GLFWwindow *window)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
+
+    // Shape controls
+    if (currentShape == nullptr)
+    {
+        return;
+    }
+
+    // Translation
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) != GLFW_PRESS)
+        currentShape->Translate(glm::vec3(-.025, 0, 0));
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) != GLFW_PRESS)
+        currentShape->Translate(glm::vec3(.025, 0, 0));
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) != GLFW_PRESS)
+        currentShape->Translate(glm::vec3(0, -.025, 0));
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) != GLFW_PRESS)
+        currentShape->Translate(glm::vec3(0, .025, 0));
+
+    // Rotation
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        currentShape->Rotate(-.025, glm::vec3(0, 1, 0));
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        currentShape->Rotate(.025, glm::vec3(0, 1, 0));
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        currentShape->Rotate(.025, glm::vec3(1, 0, 0));
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        currentShape->Rotate(-.025, glm::vec3(1, 0, 0));
+
+    // Scaling
+    if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
+        currentShape->Scale(1.01);
+    if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS)
+        currentShape->Scale(0.99);
 }
