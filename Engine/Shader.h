@@ -14,6 +14,8 @@
 
 class Shader
 {
+  glm::mat4 projection;
+
 public:
   // the program ID
   unsigned int ID;
@@ -21,6 +23,8 @@ public:
   // constructor reads and builds the shader
   Shader() {}
   Shader(const char *vertexPath, const char *fragmentPath);
+  void usePerspective(float fov, float aspect, float zNear, float zFar);
+  void useOrtho();
   // use/activate the shader
   void use();
   // utility uniform functions
@@ -113,11 +117,24 @@ Shader::Shader(const char *vertexPath, const char *fragmentPath)
   // delete the shaders as they're linked into our program now and no longer necessary
   glDeleteShader(vertex);
   glDeleteShader(fragment);
+
+  projection = glm::perspective(glm::radians(45.0f), 8.0f / 6.0f, 0.1f, 100.0f); // Default perspective projection
 }
 
 void Shader::use()
 {
   glUseProgram(ID);
+  setMatrix4("projection", projection);
+}
+
+void Shader::usePerspective(float fov, float aspect, float zNear, float zFar)
+{
+  projection = glm::perspective(fov, aspect, zNear, zFar);
+}
+
+void Shader::useOrtho()
+{
+  // TODO: Figure out ortho arguments. We may not even want to use this.
 }
 
 void Shader::setBool(const std::string &name, bool value) const

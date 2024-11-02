@@ -25,14 +25,14 @@ private:
         Triangles,
         Elements
     };
+    void initMatrices();
     VAO vao;
     VB vbo = VB(GL_ARRAY_BUFFER, GL_STATIC_DRAW), ebo = VB(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW);
     Texture tex = Texture(GL_TEXTURE_2D);
     Shader shader;
     DrawMethod drawMethod;       // Specifies method in which to draw
     int drawFirst, drawElements; // Specifies how to draw data
-    glm::mat4 transform;
-    glm::vec3 translate;
+    glm::mat4 model, view;       // Transformation matrices
     float rotation;
 
 public:
@@ -48,7 +48,7 @@ public:
     void Draw();                                                                      // Draws the data
     void SetTexture(Texture &txtr);                                                   // Sets texture to an already existing one
     void SetShader(Shader &shdr);
-    void Rotate(float angle);
+    void Rotate(float angle, glm::vec3 axis);
     void Scale(float scalar);
     void Translate(glm::vec3 trans);
 };
@@ -60,8 +60,9 @@ public:
     @param vertices Specify vertex data for VBO
     @param vSize Specify size of vertex data for VBO
 */
-Shape::Shape(GLenum type, float *vertices, int vSize) : transform(glm::mat4(1.0f)), translate(glm::vec3(0, 0, 0)), vbo(GL_ARRAY_BUFFER, type)
+Shape::Shape(GLenum type, float *vertices, int vSize) : vbo(GL_ARRAY_BUFFER, type)
 {
+    initMatrices();
     UpdateData(vertices, vSize);
 }
 
@@ -76,6 +77,7 @@ Shape::Shape(GLenum type, float *vertices, int vSize) : transform(glm::mat4(1.0f
 */
 Shape::Shape(GLenum type, float *vertices, int vSize, unsigned int *indices, int iSize) : vbo(GL_ARRAY_BUFFER, type), ebo(GL_ELEMENT_ARRAY_BUFFER, type)
 {
+    initMatrices();
     UpdateData(vertices, vSize, indices, iSize);
 }
 /**
@@ -83,7 +85,7 @@ Shape::Shape(GLenum type, float *vertices, int vSize, unsigned int *indices, int
  * @details Reads in an OBJ file and creates a mesh based on that
  * @param objPath Path to the obj file
  */
-Shape::Shape(GLenum type, std::string path) : vbo(GL_ARRAY_BUFFER, type), ebo(GL_ELEMENT_ARRAY_BUFFER, type), transform(glm::mat4(1.0f))
+Shape::Shape(GLenum type, std::string path) : vbo(GL_ARRAY_BUFFER, type), ebo(GL_ELEMENT_ARRAY_BUFFER, type)
 {
     std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
     std::vector<float> vertices, normals;
@@ -152,7 +154,18 @@ Shape::Shape(GLenum type, std::string path) : vbo(GL_ARRAY_BUFFER, type), ebo(GL
     float *vertices_arr = &vertices[0];
     unsigned int *vertexIndices_arr = &vertexIndices[0];
 
+    initMatrices();
     UpdateData(vertices_arr, vertices.size() * sizeof(float), vertexIndices_arr, vertexIndices.size() * sizeof(unsigned int));
+}
+
+/**
+ * @brief Initializes transformation matrices
+ * @details Sets both transformation matrices to be the identity
+ */
+void Shape::initMatrices()
+{
+    model = glm::mat4(1.0f);
+    view = glm::mat4(1.0f);
 }
 
 /**
@@ -236,7 +249,8 @@ void Shape::SetDrawData(int first, int elements)
 void Shape::Draw()
 {
     shader.use();
-    shader.setMatrix4("transform", transform);
+    shader.setMatrix4("model", model);
+    shader.setMatrix4("view", view);
     Bind();
     switch (drawMethod)
     {
@@ -277,12 +291,9 @@ void Shape::SetShader(Shader &shdr)
     @details Rotate the shape by a given angle (Radians)
     @param angle The angle to be rotated by
  */
-void Shape::Rotate(float angle)
+void Shape::Rotate(float angle, glm::vec3 axis)
 {
-    // transform = glm::translate(transform, glm::vec3(0, 0, 0));
-    transform = glm::rotate(transform, angle, glm::vec3(0, 0, 1));
-    // transform = glm::translate(transform, translate);
-    rotation += angle;
+    model = glm::rotate(model, angle, axis);
 }
 
 /**
@@ -292,7 +303,7 @@ void Shape::Rotate(float angle)
  */
 void Shape::Scale(float scalar)
 {
-    transform = glm::scale(transform, glm::vec3(scalar, scalar, 1));
+    model = glm::scale(model, glm::vec3(scalar, scalar, scalar));
 }
 
 /**
@@ -300,9 +311,9 @@ void Shape::Scale(float scalar)
     @details Translate the shape by a given translation vector
     @param trans The translation vector to be applied to the shape
  */
-void Shape::Translate(glm::vec3 trans)
+void Shape::Translate(glm::vec3 vec)
 {
-    transform = glm::translate(transform, trans);
+    view = glm::translate(view, vec);
 }
 
 #endif
