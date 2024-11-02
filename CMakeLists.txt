@@ -10,13 +10,11 @@ set(CMAKE_MAIN_PROJECT ${PROJECT_NAME} CACHE INTERNAL "")
 include(CTest)
 enable_testing()
 
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
 
 ################################
 # Compile Statically for Windows
 ################################
+
 if(WIN32) # Need to compile statically to prevent Windows .dll not found error for glfw
 set(VCPKG_HOST_TRIPLET x64-windows-static)
 set(VCPKG_TARGET_TRIPLET x64-windows-static)
@@ -26,9 +24,9 @@ endif()
 # Define Apple Architecture #
 #############################
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	add_definitions(-DMACOSX=1)
+add_definitions(-DMACOSX=1)
 else()
-	add_definitions(-DMACOSX=0)
+add_definitions(-DMACOSX=0)
 endif()
 
 ###############
@@ -37,7 +35,7 @@ endif()
 OPTION(BUILD_WITH_DOCS "Generate Docs" ON)
 set(BUILD_WITH_DOCS OFF) # Set this to ON to manually build with docs.
 IF(BUILD_WITH_DOCS)
-	ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/docs)
+ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/docs)
 ENDIF()
 
 #############################################################
@@ -56,6 +54,7 @@ include(./vcpkg/scripts/buildsystems/vcpkg.cmake)
 ########################
 # Find and link packages
 ########################
+
 find_package(glad CONFIG REQUIRED)
 target_link_libraries(ShapesSandbox_Testing PRIVATE glad::glad)
 
@@ -70,3 +69,17 @@ target_include_directories(ShapesSandbox_Testing PRIVATE ${Stb_INCLUDE_DIR})
 
 find_package(glm CONFIG REQUIRED)
 target_link_libraries(ShapesSandbox_Testing PRIVATE glm::glm)
+
+############################
+# Install packages for CPack
+############################
+
+install(TARGETS ShapesSandbox_Testing RUNTIME DESTINATION bin)
+
+install(DIRECTORY build/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/include/ DESTINATION bin)
+install(DIRECTORY Resources DESTINATION /) 
+
+
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+include(CPack)
