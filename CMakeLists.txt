@@ -70,6 +70,9 @@ target_include_directories(ShapesSandbox_Testing PRIVATE ${Stb_INCLUDE_DIR})
 find_package(glm CONFIG REQUIRED)
 target_link_libraries(ShapesSandbox_Testing PRIVATE glm::glm)
 
+############################
+# Install packages for CPack
+############################
 
 install(TARGETS ShapesSandbox_Testing RUNTIME DESTINATION bin)
 
