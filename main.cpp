@@ -44,7 +44,7 @@ int main(int, char **)
     Shader shader1("../Resources/Shaders/Simple.vs", "../Resources/Shaders/Simple.fs");
     Shader shader2("../Resources/Shaders/4.1.texture.vs", "../Resources/Shaders/4.1.texture.fs");
 
-    ms = new MatrixStack();
+    ms = MatrixStack::getInstance();
     camera = new Camera(ms);
 
     // VAO textureVAO = bindImageToVAO();
@@ -141,8 +141,8 @@ int main(int, char **)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // texShape.Draw();
-        shape1.Draw(ms);
-        shape2.Draw(ms);
+        shape1.Draw();
+        shape2.Draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

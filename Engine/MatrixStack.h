@@ -8,10 +8,25 @@
 
 class MatrixStack
 {
-public:
+  static MatrixStack *instancePtr;
+  std::stack<glm::mat4> stack;
+
   MatrixStack()
   {
     stack.push(glm::mat4(1.0f)); // Initialize with identity matrix
+  }
+
+public:
+  MatrixStack(MatrixStack &) = delete;
+  void operator=(const MatrixStack &) = delete;
+
+  static MatrixStack *getInstance()
+  {
+    if (instancePtr == nullptr)
+    {
+      instancePtr = new MatrixStack();
+    }
+    return instancePtr;
   }
 
   void push()
@@ -28,9 +43,8 @@ public:
   {
     return stack.top();
   }
-
-private:
-  std::stack<glm::mat4> stack;
 };
+
+MatrixStack *MatrixStack::instancePtr = nullptr;
 
 #endif

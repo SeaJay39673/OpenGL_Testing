@@ -35,6 +35,7 @@ private:
     int drawFirst, drawElements; // Specifies how to draw data
     glm::mat4 model, view;       // Transformation matrices
     float rotation;
+    MatrixStack *ms;
 
 public:
     Shape(GLenum type, float *vertices, int vSize);                                   // Creates just a VAO and VBO
@@ -46,7 +47,7 @@ public:
     void Bind();                                                                      // Binds all of the objects
     void Unbind();                                                                    // Unbinds all of the objects
     void SetDrawData(int first, int elements);                                        // Sets the Draw data
-    void Draw(MatrixStack *ms);                                                       // Draws the data
+    void Draw();                                                                      // Draws the data
     void SetTexture(Texture &txtr);                                                   // Sets texture to an already existing one
     void SetShader(Shader &shdr);
     void Rotate(float angle, glm::vec3 axis);
@@ -167,6 +168,8 @@ void Shape::initMatrices()
 {
     model = glm::mat4(1.0f);
     view = glm::mat4(1.0f);
+
+    ms = MatrixStack::getInstance();
 }
 
 /**
@@ -247,7 +250,7 @@ void Shape::SetDrawData(int first, int elements)
     @brief Draws the shape
     @details Uses the provided shader, binds the object, calls its draw function, and unbinds.
  */
-void Shape::Draw(MatrixStack *ms)
+void Shape::Draw()
 {
     ms->push();
     ms->top() *= view * model;
