@@ -13,6 +13,7 @@
 #include "Engine/Shader.h"
 #include "Engine/Shape.h"
 #include "Engine/Texture.h"
+#include "Engine/Light.h"
 //====| Namespaces |====//
 using namespace std;
 

@@ -31,6 +31,7 @@ public:
   void setBool(const std::string &name, bool value) const;
   void setInt(const std::string &name, int value) const;
   void setFloat(const std::string &name, float value) const;
+  void setVec3(const std::string &name, glm::vec3 vec) const;
   void setMatrix3(const std::string &name, glm::mat3 mat) const;
   void setMatrix4(const std::string &name, glm::mat4 mat) const;
 };
@@ -149,12 +150,14 @@ void Shader::setFloat(const std::string &name, float value) const
 {
   glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
 }
-
+void Shader::setVec3(const std::string &name, glm::vec3 vec) const
+{
+  glUniform3f(glGetUniformLocation(ID, name.c_str()), vec.x, vec.y, vec.z);
+}
 void Shader::setMatrix3(const std::string &name, glm::mat3 mat) const
 {
   glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, glm::value_ptr(mat));
 }
-
 void Shader::setMatrix4(const std::string &name, glm::mat4 mat) const
 {
   glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
