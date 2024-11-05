@@ -13,17 +13,25 @@
 #include "Engine/Shader.h"
 #include "Engine/Shape.h"
 #include "Engine/Texture.h"
+#include "Engine/MatrixStack.h"
+#include "Engine/Camera.h"
 //====| Namespaces |====//
 using namespace std;
 
 //====| Global Variables |====//
 int _width = 800, _height = 600;
+float lastX = 400, lastY = 300; // Mouse variables
+bool isFirstMouse = true;
 Shape *currentShape;
+MatrixStack *ms;
+Camera *camera;
 //====| Function Declarations |====//
 GLFWwindow *initWindow();                                                  // Create and initialize window to default variables
 bool initGlad();                                                           // Initialize glad to expose OpenGL function pointers
 void framebuffer_size_callback(GLFWwindow *window, int width, int height); // function that sets GLFWwindow size when user changes it
+void mouse_callback(GLFWwindow *window, double xpos, double ypos);         // Mouse input callback
 void processInput(GLFWwindow *window);                                     // Process user input
+
 //====| Main |====//
 int main(int, char **)
 {
@@ -35,6 +43,9 @@ int main(int, char **)
 
     Shader shader1("../Resources/Shaders/Simple.vs", "../Resources/Shaders/Simple.fs");
     Shader shader2("../Resources/Shaders/4.1.texture.vs", "../Resources/Shaders/4.1.texture.fs");
+
+    ms = MatrixStack::getInstance();
+    camera = new Camera(ms);
 
     // VAO textureVAO = bindImageToVAO();
     // Vertices coordinates
@@ -105,7 +116,15 @@ int main(int, char **)
     shape1.SetShader(shader1);
 
     // Move the shape into the view volume for viewing
-    shape1.Translate(glm::vec3(0, 0, -5.0f));
+    shape1.Translate(glm::vec3(0, 0, 5.0f));
+
+    Shape shape2 = Shape(GL_STATIC_DRAW, "../Resources/Models/cube.obj");
+    shape2.SetVertexPointer(0, 3, 3, 0);
+    shape2.SetDrawData(0, 12 * 3);
+    shape2.SetShader(shader1);
+
+    // Move the shape into the view volume for viewing
+    shape2.Translate(glm::vec3(0, 5.0f, 5.0f));
 
     currentShape = &shape1;
 
@@ -123,6 +142,7 @@ int main(int, char **)
 
         // texShape.Draw();
         shape1.Draw();
+        shape2.Draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -160,6 +180,8 @@ GLFWwindow *initWindow()
 
     glfwGetWindowSize(window, &_width, &_height);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // Call back so user can resize the window
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);       // Fix the cursor to the middle of the window
+    glfwSetCursorPosCallback(window, mouse_callback);
 
     if (!initGlad()) // If failed, exit
     {
@@ -208,6 +230,30 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
     glViewport(0, 0, _width, _height);
 }
 
+void mouse_callback(GLFWwindow *window, double xpos, double ypos)
+{
+    if (isFirstMouse) // initially set to true
+    {
+        lastX = xpos;
+        lastY = ypos;
+        isFirstMouse = false;
+    }
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
+    lastX = xpos;
+    lastY = ypos;
+
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    if (camera != nullptr)
+    {
+        camera->Pitch(yoffset);
+        camera->Yaw(xoffset);
+    }
+}
+
 /*
     Gets user input and responds accordingly
     Parameters: GLFWwindow* window
@@ -219,7 +265,7 @@ void processInput(GLFWwindow *window)
     {
         glfwSetWindowShouldClose(window, true);
     }
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
@@ -229,34 +275,54 @@ void processInput(GLFWwindow *window)
     }
 
     // Shape controls
-    if (currentShape == nullptr)
+    if (currentShape != nullptr)
     {
-        return;
+
+        // Translation
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) != GLFW_PRESS)
+            currentShape->Translate(glm::vec3(-.025, 0, 0));
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) != GLFW_PRESS)
+            currentShape->Translate(glm::vec3(.025, 0, 0));
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) != GLFW_PRESS)
+            currentShape->Translate(glm::vec3(0, -.025, 0));
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) != GLFW_PRESS)
+            currentShape->Translate(glm::vec3(0, .025, 0));
+
+        // Rotation
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)
+            currentShape->Rotate(-.025, glm::vec3(0, 1, 0));
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)
+            currentShape->Rotate(.025, glm::vec3(0, 1, 0));
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)
+            currentShape->Rotate(.025, glm::vec3(1, 0, 0));
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)
+            currentShape->Rotate(-.025, glm::vec3(1, 0, 0));
+
+        // Scaling
+        if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
+            currentShape->Scale(1.01);
+        if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS)
+            currentShape->Scale(0.99);
     }
 
-    // Translation
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) != GLFW_PRESS)
-        currentShape->Translate(glm::vec3(-.025, 0, 0));
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) != GLFW_PRESS)
-        currentShape->Translate(glm::vec3(.025, 0, 0));
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) != GLFW_PRESS)
-        currentShape->Translate(glm::vec3(0, -.025, 0));
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) != GLFW_PRESS)
-        currentShape->Translate(glm::vec3(0, .025, 0));
-
-    // Rotation
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        currentShape->Rotate(-.025, glm::vec3(0, 1, 0));
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        currentShape->Rotate(.025, glm::vec3(0, 1, 0));
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        currentShape->Rotate(.025, glm::vec3(1, 0, 0));
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        currentShape->Rotate(-.025, glm::vec3(1, 0, 0));
-
-    // Scaling
-    if (glfwGetKey(window, GLFW_KEY_PERIOD) == GLFW_PRESS)
-        currentShape->Scale(1.01);
-    if (glfwGetKey(window, GLFW_KEY_COMMA) == GLFW_PRESS)
-        currentShape->Scale(0.99);
+    if (camera != nullptr)
+    {
+        // Translation
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            camera->SlideFront(0.05);
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            camera->SlideFront(-.05);
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            camera->SlideSide(.05);
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            camera->SlideSide(-.05);
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+            camera->SlideUp(.05);
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            camera->SlideUp(-.025);
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+            camera->Roll(.05);
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+            camera->Roll(-.025);
+    }
 }

@@ -17,6 +17,7 @@
 #include "VB.h"
 #include "Texture.h"
 #include "Shader.h"
+#include "MatrixStack.h"
 class Shape
 {
 private:
@@ -34,6 +35,7 @@ private:
     int drawFirst, drawElements; // Specifies how to draw data
     glm::mat4 model, view;       // Transformation matrices
     float rotation;
+    MatrixStack *ms;
 
 public:
     Shape(GLenum type, float *vertices, int vSize);                                   // Creates just a VAO and VBO
@@ -166,6 +168,8 @@ void Shape::initMatrices()
 {
     model = glm::mat4(1.0f);
     view = glm::mat4(1.0f);
+
+    ms = MatrixStack::getInstance();
 }
 
 /**
@@ -248,9 +252,10 @@ void Shape::SetDrawData(int first, int elements)
  */
 void Shape::Draw()
 {
+    ms->push();
+    ms->top() *= view * model;
     shader.use();
-    shader.setMatrix4("model", model);
-    shader.setMatrix4("view", view);
+    shader.setMatrix4("viewmodel", ms->top());
     Bind();
     switch (drawMethod)
     {
@@ -263,6 +268,7 @@ void Shape::Draw()
         break;
     }
     Unbind();
+    ms->pop();
 }
 
 /**
