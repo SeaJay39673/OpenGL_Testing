@@ -17,6 +17,7 @@
 #include "VB.h"
 #include "Texture.h"
 #include "Shader.h"
+#include "MatrixStack.h"
 class Shape
 {
 private:
@@ -45,7 +46,7 @@ public:
     void Bind();                                                                      // Binds all of the objects
     void Unbind();                                                                    // Unbinds all of the objects
     void SetDrawData(int first, int elements);                                        // Sets the Draw data
-    void Draw();                                                                      // Draws the data
+    void Draw(MatrixStack *ms);                                                       // Draws the data
     void SetTexture(Texture &txtr);                                                   // Sets texture to an already existing one
     void SetShader(Shader &shdr);
     void Rotate(float angle, glm::vec3 axis);
@@ -246,11 +247,12 @@ void Shape::SetDrawData(int first, int elements)
     @brief Draws the shape
     @details Uses the provided shader, binds the object, calls its draw function, and unbinds.
  */
-void Shape::Draw()
+void Shape::Draw(MatrixStack *ms)
 {
+    ms->push();
+    ms->top() *= view * model;
     shader.use();
-    shader.setMatrix4("model", model);
-    shader.setMatrix4("view", view);
+    shader.setMatrix4("viewmodel", ms->top());
     Bind();
     switch (drawMethod)
     {
@@ -263,6 +265,7 @@ void Shape::Draw()
         break;
     }
     Unbind();
+    ms->pop();
 }
 
 /**
