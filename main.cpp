@@ -119,7 +119,7 @@ int main(int, char **)
     // Move the shape into the view volume for viewing
     shape1.Translate(glm::vec3(0, 0, 5.0f));
 
-    Shape shape2 = Shape(GL_STATIC_DRAW, "../Resources/Models/cube.obj");
+    Shape shape2 = Shape(GL_STATIC_DRAW, "../Resources/Models/cube2.obj");
     shape2.SetVertexPointer(0, 3, 3, 0);
     shape2.SetDrawData(0, 12 * 3);
     shape2.SetShader(shader1);
@@ -138,7 +138,7 @@ int main(int, char **)
 
         // rendering commands
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.25f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // texShape.Draw();

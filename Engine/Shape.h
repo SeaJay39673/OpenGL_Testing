@@ -18,6 +18,15 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "MatrixStack.h"
+
+struct Material
+{
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    float shininess;
+};
+
 class Shape
 {
 private:
@@ -36,6 +45,7 @@ private:
     glm::mat4 model, view;       // Transformation matrices
     float rotation;
     MatrixStack *ms;
+    Material *mat;
 
 public:
     Shape(GLenum type, float *vertices, int vSize);                                   // Creates just a VAO and VBO
@@ -49,10 +59,12 @@ public:
     void SetDrawData(int first, int elements);                                        // Sets the Draw data
     void Draw();                                                                      // Draws the data
     void SetTexture(Texture &txtr);                                                   // Sets texture to an already existing one
-    void SetShader(Shader &shdr);
     void Rotate(float angle, glm::vec3 axis);
     void Scale(float scalar);
     void Translate(glm::vec3 trans);
+    void SetShader(Shader &shdr);
+    Shader *GetShader();
+    void SetMaterial(Material *mat);
 };
 
 /**
@@ -256,6 +268,15 @@ void Shape::Draw()
     ms->top() *= view * model;
     shader.use();
     shader.setMatrix4("viewmodel", ms->top());
+    // Set the material in the shader
+    if (mat != nullptr)
+    {
+        shader.setVec3("material.ambient", mat->ambient);
+        shader.setVec3("material.diffuse", mat->diffuse);
+        shader.setVec3("material.specular", mat->specular);
+        shader.setFloat("material.shininess", mat->shininess);
+    }
+
     Bind();
     switch (drawMethod)
     {
@@ -280,16 +301,6 @@ void Shape::SetTexture(Texture &txtr)
 {
     Bind();
     tex = txtr;
-}
-
-/**
-    @brief Sets the current shader
-    @details Pass in a shader object, this class receives it by reference
-    @param shdr The shader object to be passed in
- */
-void Shape::SetShader(Shader &shdr)
-{
-    shader = shdr;
 }
 
 /**
@@ -320,6 +331,26 @@ void Shape::Scale(float scalar)
 void Shape::Translate(glm::vec3 vec)
 {
     view = glm::translate(view, vec);
+}
+
+/**
+    @brief Sets the current shader
+    @details Pass in a shader object, this class receives it by reference
+    @param shdr The shader object to be passed in
+ */
+void Shape::SetShader(Shader &shdr)
+{
+    shader = shdr;
+}
+
+Shader *Shape::GetShader()
+{
+    return &shader;
+}
+
+void Shape::SetMaterial(Material *_mat)
+{
+    mat = _mat;
 }
 
 #endif
