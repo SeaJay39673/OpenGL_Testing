@@ -17,6 +17,7 @@ enum LightType
 struct BaseLight
 {
   LightType type;
+  glm::vec3 ambient, diffuse, specular;
 };
 struct DirectionalLight : BaseLight
 {
@@ -24,7 +25,7 @@ struct DirectionalLight : BaseLight
   {
     type = Directional;
   }
-  glm::vec3 direction, ambient, diffuse, specular;
+  glm::vec3 direction;
 };
 
 struct PointLight : BaseLight
@@ -33,7 +34,7 @@ struct PointLight : BaseLight
   {
     type = Point;
   }
-  glm::vec3 position, ambient, diffuse, specular;
+  glm::vec3 position;
   float constant, linear, quadratic;
 };
 
