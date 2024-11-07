@@ -59,6 +59,11 @@ Camera::Camera(MatrixStack *_ms, glm::vec3 _up = glm::vec3(0, 1, 0))
   updateCamera();
 }
 
+/**
+ *  @brief Sets the shader of the camera
+ * @details Sets pointer to shader
+ * @param _shader Pointer to the desired shader
+ */
 void Camera::SetShader(Shader *_shader)
 {
   shader = _shader;

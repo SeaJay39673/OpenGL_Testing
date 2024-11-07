@@ -37,11 +37,20 @@ struct PointLight : BaseLight
   float constant, linear, quadratic;
 };
 
+/**
+    @class Light Light.h "Engine/Light.h"
+    @brief Class for creating and managing lights
+    @details This class is used to create and manage lights. It will update lighting information in the shader.
+    @author Kyler Legault
+    @date 11/7/24
+*/
+
 class Light
 {
   Shape *mesh;
   int lightIndex;
   BaseLight *lp;
+  void updateShaderInformation();
 
 public:
   Light(BaseLight *l, Shader *s);
@@ -53,7 +62,6 @@ public:
   void Scale(float scalar);
   void Translate(glm::vec3 trans);
   void SetLight(BaseLight *l);
-  void updateShaderInformation();
 };
 
 namespace LightIndex
@@ -78,6 +86,12 @@ namespace LightIndex
   }
 }
 
+/**
+    @brief Initializes Light
+    @details Creates the underlying mesh object and sets light parameters.
+    @param l Pointer to a light struct (Directional or Point at this moment)
+    @param s Pointer to the shader.
+*/
 Light::Light(BaseLight *l, Shader *s)
 {
   mesh = new Shape(GL_STATIC_DRAW, "../Resources/Models/cube.obj");
@@ -100,6 +114,10 @@ Light::Light(BaseLight *l, Shader *s)
   updateShaderInformation();
 }
 
+/**
+    @brief Light destructor
+    @details Removes the light from the global light index
+*/
 Light::~Light()
 {
   if (lp->type == Point)
@@ -108,17 +126,29 @@ Light::~Light()
   }
 }
 
+/**
+    @brief Sets the global light index
+    @details Used by the LightIndex namespace to change the global light index of the light
+*/
 void Light::SetLightIndex(int index)
 {
   lightIndex = index;
   updateShaderInformation();
 }
 
+/**
+    @brief Returns the global light index
+    @details Used by the LightIndex namespace
+*/
 int Light::GetLightIndex()
 {
   return lightIndex;
 }
 
+/**
+    @brief Updates internal light information
+    @details Updates light properties on the shader
+*/
 void Light::updateShaderInformation()
 {
   Shader *s = mesh->GetShader();
@@ -152,6 +182,10 @@ void Light::updateShaderInformation()
   }
 }
 
+/**
+    @brief Draws the light
+    @details Draws the underlying mesh of the light for visualization
+*/
 void Light::Draw()
 {
   if (lp->type != Directional)
@@ -159,23 +193,55 @@ void Light::Draw()
     mesh->Draw();
   }
 }
+
+/**
+    @brief Rotates the light
+    @details Rotates the underlying mesh of the light and light direction for spotlights
+    @param angle Angle to rotate by
+    @param axis Axis to rotate by
+*/
 void Light::Rotate(float angle, glm::vec3 axis)
 {
   mesh->Rotate(angle, axis);
 }
+
+/**
+    @brief Scales the light
+    @details Scales the underlying mesh of the light
+    @param scalar Amount to scale by
+*/
 void Light::Scale(float scalar)
 {
   mesh->Scale(scalar);
 }
+
+/**
+    @brief Translates the light
+    @details Translates the underlying mesh and light postion for point and spot lights
+    @param trans Vector to translate by
+*/
 void Light::Translate(glm::vec3 trans)
 {
   mesh->Translate(trans);
+  if (lp->type != Directional)
+  {
+    PointLight *tmp = (PointLight *)lp;
+    tmp->position += trans;
+    updateShaderInformation();
+  }
 }
 
+/**
+    @brief Sets the light properties
+    @details Allows the user to use the same light object for a different type of light
+    @param l Directional or Point light struct with new light properties
+*/
 void Light::SetLight(BaseLight *l)
 {
   lp = l;
   updateShaderInformation();
+
+  // TODO: handle lightindex, position, etc.
 }
 
 #endif

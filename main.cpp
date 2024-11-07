@@ -147,7 +147,7 @@ int main(int, char **)
     pl->linear = 0.0014;
     pl->constant = 1;
 
-    Light l = Light(pl, &shader1);
+    Light l = Light(dl, &shader1);
 
     currentShape = &shape1;
 
