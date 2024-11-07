@@ -12,19 +12,22 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <fstream>
+#include <iostream>
 #include <vector>
 #include "VAO.h"
 #include "VB.h"
 #include "Texture.h"
 #include "Shader.h"
 #include "MatrixStack.h"
+#include "Material.h"
 
-struct Material
+using glm::vec3, glm::vec2;
+
+struct Vertex
 {
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-    float shininess;
+    vec3 position;
+    vec3 normal;
+    vec2 texture;
 };
 
 class Shape
@@ -39,7 +42,7 @@ private:
     VAO vao;
     VB vbo = VB(GL_ARRAY_BUFFER, GL_STATIC_DRAW), ebo = VB(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW);
     Texture tex = Texture(GL_TEXTURE_2D);
-    Shader shader;
+    Shader *shader;
     DrawMethod drawMethod;       // Specifies method in which to draw
     int drawFirst, drawElements; // Specifies how to draw data
     glm::mat4 model, view;       // Transformation matrices
@@ -51,18 +54,19 @@ public:
     Shape(GLenum type, float *vertices, int vSize);                                   // Creates just a VAO and VBO
     Shape(GLenum type, float *vertices, int vSize, unsigned int *indices, int iSize); // Creates VAO, VBO, and EBO
     Shape(GLenum type, std::string objPath);                                          // Loads mesh from a given obj file path
-    void UpdateData(float *vertices, int vSize);                                      // Updates the VBO
-    void UpdateData(float *vertices, int vSize, unsigned int *indices, int iSize);    // Updates the VBO and EBO
-    void SetVertexPointer(GLuint layout, int elements, int span, int index);          // Tells graphics shader how to interpret the data
-    void Bind();                                                                      // Binds all of the objects
-    void Unbind();                                                                    // Unbinds all of the objects
-    void SetDrawData(int first, int elements);                                        // Sets the Draw data
-    void Draw();                                                                      // Draws the data
-    void SetTexture(Texture &txtr);                                                   // Sets texture to an already existing one
-    void Rotate(float angle, glm::vec3 axis);
+    void UpdateData(Vertex *vertices, int vSize);
+    void UpdateData(float *vertices, int vSize);                                   // Updates the VBO
+    void UpdateData(float *vertices, int vSize, unsigned int *indices, int iSize); // Updates the VBO and EBO
+    void SetVertexPointer(GLuint layout, int elements, int span, int index);       // Tells graphics shader how to interpret the data
+    void Bind();                                                                   // Binds all of the objects
+    void Unbind();                                                                 // Unbinds all of the objects
+    void SetDrawData(int first, int elements);                                     // Sets the Draw data
+    void Draw();                                                                   // Draws the data
+    void SetTexture(Texture &txtr);                                                // Sets texture to an already existing one
+    void Rotate(float angle, vec3 axis);
     void Scale(float scalar);
-    void Translate(glm::vec3 trans);
-    void SetShader(Shader &shdr);
+    void Translate(vec3 trans);
+    void SetShader(Shader *shdr);
     Shader *GetShader();
     void SetMaterial(Material *mat);
 };
@@ -102,9 +106,11 @@ Shape::Shape(GLenum type, float *vertices, int vSize, unsigned int *indices, int
 Shape::Shape(GLenum type, std::string path) : vbo(GL_ARRAY_BUFFER, type), ebo(GL_ELEMENT_ARRAY_BUFFER, type)
 {
     std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
-    std::vector<float> vertices, normals;
-    std::vector<float> uvs;
+    std::vector<vec3> positions, normals;
+    std::vector<vec2> uvs;
+    std::vector<Vertex> vertices;
     float buffer[3];
+    int faceCount = 0;
 
     FILE *file = fopen(path.c_str(), "r");
     if (file == NULL)
@@ -125,26 +131,17 @@ Shape::Shape(GLenum type, std::string path) : vbo(GL_ARRAY_BUFFER, type), ebo(GL
         if (strcmp(lineHeader, "v") == 0)
         {
             fscanf(file, "%f %f %f\n", &buffer[0], &buffer[1], &buffer[2]);
-            for (int i = 0; i < 3; i++)
-            {
-                vertices.push_back(buffer[i]);
-            }
+            positions.push_back(vec3(buffer[0], buffer[1], buffer[2]));
         }
         else if (strcmp(lineHeader, "vt") == 0)
         {
             fscanf(file, "%f %f\n", &buffer[0], &buffer[1]);
-            for (int i = 0; i < 2; i++)
-            {
-                uvs.push_back(buffer[i]);
-            }
+            uvs.push_back(vec3(buffer[0], buffer[1], buffer[2]));
         }
         else if (strcmp(lineHeader, "vn") == 0)
         {
             fscanf(file, "%f %f %f\n", &buffer[0], &buffer[1], &buffer[2]);
-            for (int i = 0; i < 3; i++)
-            {
-                normals.push_back(buffer[i]);
-            }
+            normals.push_back(vec3(buffer[0], buffer[1], buffer[2]));
         }
         else if (strcmp(lineHeader, "f") == 0)
         {
@@ -162,14 +159,31 @@ Shape::Shape(GLenum type, std::string path) : vbo(GL_ARRAY_BUFFER, type), ebo(GL
                 uvIndices.push_back(uvIndex[i]);
                 normalIndices.push_back(normalIndex[i]);
             }
+            faceCount++;
         }
     }
 
-    float *vertices_arr = &vertices[0];
-    unsigned int *vertexIndices_arr = &vertexIndices[0];
+    Vertex *vBuffer;
+    vec3 defaultVec3 = vec3(0, 0, 0);
+    vec2 defaultVec2 = vec2(0, 0);
+
+    for (int i = 0; i < faceCount * 3; i++)
+    {
+        vBuffer = new Vertex();
+        vBuffer->position = positions.size() > 0 ? positions.at(vertexIndices[i]) : defaultVec3;
+        vBuffer->normal = normals.size() > 0 ? normals.at(normalIndices[i]) : defaultVec3;
+        vBuffer->texture = uvs.size() > 0 ? uvs.at(uvIndices[i]) : defaultVec2;
+
+        vertices.push_back(*vBuffer);
+    }
 
     initMatrices();
-    UpdateData(vertices_arr, vertices.size() * sizeof(float), vertexIndices_arr, vertexIndices.size() * sizeof(unsigned int));
+    UpdateData(&vertices[0], vertices.size() * sizeof(Vertex));
+
+    SetVertexPointer(0, 3, 8, 0);
+    SetVertexPointer(1, 3, 8, 3);
+    SetVertexPointer(2, 2, 8, 6);
+    SetDrawData(0, vertices.size() * 10000);
 }
 
 /**
@@ -182,6 +196,19 @@ void Shape::initMatrices()
     view = glm::mat4(1.0f);
 
     ms = MatrixStack::getInstance();
+}
+
+/**
+    @brief Updates the VBO data
+    @details Updates the VBO with passed in data, determines how the draw method should function based on data.
+    @param vertices Specify vertex data for VBO
+    @param vSize Specify size of vertex data for VBO
+ */
+void Shape::UpdateData(Vertex *vertices, int vSize)
+{
+    Bind();
+    vbo.UpdateData(vertices, vSize);
+    drawMethod = Triangles;
 }
 
 /**
@@ -265,16 +292,18 @@ void Shape::SetDrawData(int first, int elements)
 void Shape::Draw()
 {
     ms->push();
-    ms->top() *= view * model;
-    shader.use();
-    shader.setMatrix4("viewmodel", ms->top());
+    ms->top() *= view;
+    shader->use();
+    shader->setMatrix4("view", ms->top());
+    shader->setMatrix4("model", model);
+    shader->setMatrix4("objectView", view);
     // Set the material in the shader
     if (mat != nullptr)
     {
-        shader.setVec3("material.ambient", mat->ambient);
-        shader.setVec3("material.diffuse", mat->diffuse);
-        shader.setVec3("material.specular", mat->specular);
-        shader.setFloat("material.shininess", mat->shininess);
+        shader->setVec3("material.ambient", mat->ambient);
+        shader->setVec3("material.diffuse", mat->diffuse);
+        shader->setVec3("material.specular", mat->specular);
+        shader->setFloat("material.shininess", mat->shininess);
     }
 
     Bind();
@@ -308,7 +337,7 @@ void Shape::SetTexture(Texture &txtr)
     @details Rotate the shape by a given angle (Radians)
     @param angle The angle to be rotated by
  */
-void Shape::Rotate(float angle, glm::vec3 axis)
+void Shape::Rotate(float angle, vec3 axis)
 {
     model = glm::rotate(glm::mat4(1.0f), angle, axis) * model;
 }
@@ -320,7 +349,7 @@ void Shape::Rotate(float angle, glm::vec3 axis)
  */
 void Shape::Scale(float scalar)
 {
-    model = glm::scale(model, glm::vec3(scalar, scalar, scalar));
+    model = glm::scale(model, vec3(scalar, scalar, scalar));
 }
 
 /**
@@ -328,7 +357,7 @@ void Shape::Scale(float scalar)
     @details Translate the shape by a given translation vector
     @param trans The translation vector to be applied to the shape
  */
-void Shape::Translate(glm::vec3 vec)
+void Shape::Translate(vec3 vec)
 {
     view = glm::translate(view, vec);
 }
@@ -338,14 +367,14 @@ void Shape::Translate(glm::vec3 vec)
     @details Pass in a shader object, this class receives it by reference
     @param shdr The shader object to be passed in
  */
-void Shape::SetShader(Shader &shdr)
+void Shape::SetShader(Shader *shdr)
 {
     shader = shdr;
 }
 
 Shader *Shape::GetShader()
 {
-    return &shader;
+    return shader;
 }
 
 void Shape::SetMaterial(Material *_mat)

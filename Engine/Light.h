@@ -40,15 +40,11 @@ struct PointLight : BaseLight
 class Light
 {
   Shape *mesh;
-  glm::vec3 color;
-  float brightness;
   int lightIndex;
   BaseLight *lp;
 
-  void updateShaderInformation();
-
 public:
-  Light(glm::vec3 position, glm::vec3 _color, float _brightness);
+  Light(BaseLight *l, Shader *s);
   ~Light();
   void SetLightIndex(int index);
   int GetLightIndex();
@@ -57,17 +53,20 @@ public:
   void Scale(float scalar);
   void Translate(glm::vec3 trans);
   void SetLight(BaseLight *l);
+  void updateShaderInformation();
 };
 
 namespace LightIndex
 {
   std::vector<Light *> lights;
-  void addLight(Light *l)
+  void addLight(Light *l, Shader *s)
   {
     lights.push_back(l);
     l->SetLightIndex(lights.size() - 1);
+
+    s->setInt("numPointLights", lights.size());
   }
-  void removeLight(int index)
+  void removeLight(int index, Shader *s)
   {
     lights.erase(lights.begin() + index);
 
@@ -75,24 +74,38 @@ namespace LightIndex
     {
       lights[i]->SetLightIndex(i);
     }
+    s->setInt("numPointLights", lights.size());
   }
 }
 
-Light::Light(glm::vec3 position, glm::vec3 _color, float _brightness = 1)
+Light::Light(BaseLight *l, Shader *s)
 {
   mesh = new Shape(GL_STATIC_DRAW, "../Resources/Models/cube.obj");
-  mesh->Scale(0.25);
-  mesh->Translate(glm::vec3(0, 10, 0));
+  mesh->SetShader(s);
+  if (l->type == Point)
+  {
+    PointLight *pl = (PointLight *)l;
+    mesh->SetMaterial(Materials::blank);
+    mesh->Translate(pl->position);
+    mesh->Scale(.1);
+  }
 
-  color = _color;
-  brightness = _brightness;
+  lp = l;
 
-  LightIndex::addLight(this);
+  if (l->type == Point)
+  {
+    LightIndex::addLight(this, mesh->GetShader());
+  }
+
+  updateShaderInformation();
 }
 
 Light::~Light()
 {
-  LightIndex::removeLight(lightIndex);
+  if (lp->type == Point)
+  {
+    LightIndex::removeLight(lightIndex, mesh->GetShader());
+  }
 }
 
 void Light::SetLightIndex(int index)
@@ -108,8 +121,6 @@ int Light::GetLightIndex()
 
 void Light::updateShaderInformation()
 {
-  if (lp == nullptr)
-    return;
   Shader *s = mesh->GetShader();
   s->use();
   DirectionalLight *dl;
@@ -164,6 +175,7 @@ void Light::Translate(glm::vec3 trans)
 void Light::SetLight(BaseLight *l)
 {
   lp = l;
+  updateShaderInformation();
 }
 
 #endif

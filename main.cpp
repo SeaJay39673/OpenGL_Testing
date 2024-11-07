@@ -16,8 +16,11 @@
 #include "Engine/Light.h"
 #include "Engine/MatrixStack.h"
 #include "Engine/Camera.h"
+#include "Engine/Material.h"
 //====| Namespaces |====//
 using namespace std;
+
+using glm::vec3;
 
 //====| Global Variables |====//
 int _width = 800, _height = 600;
@@ -47,6 +50,7 @@ int main(int, char **)
 
     ms = MatrixStack::getInstance();
     camera = new Camera(ms);
+    camera->SetShader(&shader1);
 
     // VAO textureVAO = bindImageToVAO();
     // Vertices coordinates
@@ -112,20 +116,38 @@ int main(int, char **)
     // texShape.Unbind();
 
     Shape shape1 = Shape(GL_STATIC_DRAW, "../Resources/Models/cube.obj");
-    shape1.SetVertexPointer(0, 3, 3, 0);
-    shape1.SetDrawData(0, 12 * 3);
-    shape1.SetShader(shader1);
+    shape1.SetShader(&shader1);
 
     // Move the shape into the view volume for viewing
-    shape1.Translate(glm::vec3(0, 0, 5.0f));
+    // shape1.Translate(glm::vec3(0, 0, 5.0f));
 
-    Shape shape2 = Shape(GL_STATIC_DRAW, "../Resources/Models/cube2.obj");
-    shape2.SetVertexPointer(0, 3, 3, 0);
-    shape2.SetDrawData(0, 12 * 3);
-    shape2.SetShader(shader1);
+    // Set shape material
+    shape1.SetMaterial(Materials::emerald);
 
-    // Move the shape into the view volume for viewing
-    shape2.Translate(glm::vec3(0, 5.0f, 5.0f));
+    // Shape shape2 = Shape(GL_STATIC_DRAW, "../Resources/Models/cube2.obj");
+    // shape2.SetVertexPointer(0, 3, 3, 0);
+    // shape2.SetDrawData(0, 12 * 3);
+    // shape2.SetShader(&shader1);
+
+    // // Move the shape into the view volume for viewing
+    // shape2.Translate(glm::vec3(0, 5.0f, 5.0f));
+
+    DirectionalLight *dl = new DirectionalLight();
+    dl->direction = vec3(0, -1, 0);
+    dl->ambient = vec3(0.2f, 0.2f, 0.2f);
+    dl->diffuse = vec3(0.5f, 0.5f, 0.5f);
+    dl->specular = vec3(1.0f, 1.0f, 1.0f);
+
+    PointLight *pl = new PointLight();
+    pl->position = vec3(0, 3, 0);
+    pl->ambient = vec3(0.2f, 0.2f, 0.2f);
+    pl->diffuse = vec3(0.7f, 0.7f, 0.7f);
+    pl->specular = vec3(1.0f, 1.0f, 1.0f);
+    pl->quadratic = 0.00007;
+    pl->linear = 0.0014;
+    pl->constant = 1;
+
+    Light l = Light(pl, &shader1);
 
     currentShape = &shape1;
 
@@ -137,13 +159,18 @@ int main(int, char **)
         processInput(window);
 
         // rendering commands
-
         glClearColor(0.25f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // texShape.Draw();
         shape1.Draw();
-        shape2.Draw();
+        l.Draw();
+        // shape2.Draw();
+
+        // shader1.setVec3("dirLight.direction", dl->direction);
+        // shader1.setVec3("dirLight.ambient", dl->ambient);
+        // shader1.setVec3("dirLight.diffuse", dl->diffuse);
+        // shader1.setVec3("dirLight.specular", dl->specular);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
