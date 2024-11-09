@@ -26,8 +26,8 @@ using glm::vec3, glm::vec2;
 struct Vertex
 {
     vec3 position;
-    vec3 normal;
     vec2 texture;
+    vec3 normal;
 };
 
 class Shape
@@ -163,6 +163,10 @@ Shape::Shape(GLenum type, std::string path) : vbo(GL_ARRAY_BUFFER, type), ebo(GL
         }
     }
 
+    fclose(file);
+
+    // std::cout << faceCount << std::endl;
+
     Vertex *vBuffer;
     vec3 defaultVec3 = vec3(0, 0, 0);
     vec2 defaultVec2 = vec2(0, 0);
@@ -170,9 +174,9 @@ Shape::Shape(GLenum type, std::string path) : vbo(GL_ARRAY_BUFFER, type), ebo(GL
     for (int i = 0; i < faceCount * 3; i++)
     {
         vBuffer = new Vertex();
-        vBuffer->position = positions.size() > 0 ? positions.at(vertexIndices[i]) : defaultVec3;
-        vBuffer->normal = normals.size() > 0 ? normals.at(normalIndices[i]) : defaultVec3;
-        vBuffer->texture = uvs.size() > 0 ? uvs.at(uvIndices[i]) : defaultVec2;
+        vBuffer->position = positions.size() > 0 ? positions[vertexIndices[i] - 1] : defaultVec3;
+        vBuffer->normal = normals.size() > 0 ? normals[normalIndices[i] - 1] : defaultVec3;
+        vBuffer->texture = uvs.size() > 0 ? uvs[uvIndices[i] - 1] : defaultVec2;
 
         vertices.push_back(*vBuffer);
     }
@@ -181,8 +185,8 @@ Shape::Shape(GLenum type, std::string path) : vbo(GL_ARRAY_BUFFER, type), ebo(GL
     UpdateData(&vertices[0], vertices.size() * sizeof(Vertex));
 
     SetVertexPointer(0, 3, 8, 0);
-    SetVertexPointer(1, 3, 8, 3);
-    SetVertexPointer(2, 2, 8, 6);
+    SetVertexPointer(1, 2, 8, 3);
+    SetVertexPointer(2, 3, 8, 5);
     SetDrawData(0, vertices.size());
 }
 
