@@ -115,7 +115,7 @@ int main(int, char **)
     // texShape.SetTexture(tex);
     // texShape.Unbind();
 
-    Shape shape1 = Shape(GL_STATIC_DRAW, "../Resources/Models/cube.obj");
+    Shape shape1 = Shape(GL_STATIC_DRAW, "../Resources/Models/sphere.obj");
     shape1.SetShader(&shader1);
 
     // Move the shape into the view volume for viewing
@@ -134,7 +134,7 @@ int main(int, char **)
 
     DirectionalLight *dl = new DirectionalLight();
     dl->direction = vec3(0, -1, 0);
-    dl->ambient = vec3(0.2f, 0.2f, 0.2f);
+    dl->ambient = vec3(0.6f, 0.6f, 0.6f);
     dl->diffuse = vec3(0.5f, 0.5f, 0.5f);
     dl->specular = vec3(1.0f, 1.0f, 1.0f);
 
@@ -147,7 +147,7 @@ int main(int, char **)
     pl->linear = 0.0014;
     pl->constant = 1;
 
-    Light l = Light(dl, &shader1);
+    Light l = Light(pl, &shader1);
 
     currentShape = &shape1;
 
