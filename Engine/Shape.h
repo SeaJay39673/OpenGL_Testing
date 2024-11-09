@@ -183,7 +183,7 @@ Shape::Shape(GLenum type, std::string path) : vbo(GL_ARRAY_BUFFER, type), ebo(GL
     SetVertexPointer(0, 3, 8, 0);
     SetVertexPointer(1, 3, 8, 3);
     SetVertexPointer(2, 2, 8, 6);
-    SetDrawData(0, vertices.size() * 10000);
+    SetDrawData(0, vertices.size());
 }
 
 /**
