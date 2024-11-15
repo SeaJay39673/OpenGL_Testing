@@ -17,6 +17,7 @@
 class Camera
 {
   MatrixStack *ms;
+  Shader *shader;
   glm::vec3 cameraPos, cameraUp, cameraFront, cameraDirection, cameraRight, up;
   float pitch, yaw, roll;
 
@@ -24,6 +25,7 @@ class Camera
 
 public:
   Camera(MatrixStack *_ms, glm::vec3 _up);
+  void SetShader(Shader *_shader);
   void SlideFront(float speed);
   void SlideSide(float speed);
   void SlideUp(float speed);
@@ -45,16 +47,26 @@ Camera::Camera(MatrixStack *_ms, glm::vec3 _up = glm::vec3(0, 1, 0))
   up = _up;
 
   // Only used in setup
-  glm::vec3 cameraTarget = glm::vec3(0, 0, 0);
+  glm::vec3 cameraTarget = glm::vec3(0, 0, 3);
 
   // Will vary with movement
-  cameraPos = glm::vec3(0, 0, 3);
+  cameraPos = glm::vec3(0, 0, 0);
   cameraDirection = glm::normalize(cameraPos - cameraTarget);
   cameraFront = glm::normalize(cameraPos - cameraDirection);
   cameraRight = glm::normalize(glm::cross(up, cameraDirection));
   cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
 
   updateCamera();
+}
+
+/**
+ *  @brief Sets the shader of the camera
+ * @details Sets pointer to shader
+ * @param _shader Pointer to the desired shader
+ */
+void Camera::SetShader(Shader *_shader)
+{
+  shader = _shader;
 }
 
 /**
@@ -143,6 +155,12 @@ void Camera::updateCamera()
 
   // Derives view matrix
   ms->top() = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
+  // Update shader information
+  if (shader != nullptr)
+  {
+    shader->setVec3("viewPos", cameraPos);
+  }
 }
 
 #endif
